@@ -1,0 +1,154 @@
+    NAT
+    
+    sudo -i
+• type following command
+◦ cat /proc/sys/net/ipv4/ip_forward
+▪ (yo
+▪ u will get False [0], make it True [1])
+◦ echo 1> /proc/sys/net/ipv4/ip_forward
+▪ (you will get True [1])
+Step 3: Go to VM3
+• Add default gateway to second interface (ens8) by typing following command
+◦ sudo route add default gw 172.16.34.38 (sencond interface of VM2)
+
+DHCP
+
+R1(config)#service dhcp
+R1(config)#ip dhcp excluded-address 10.0.0.1 10.0.0.10
+(* Do not assign addresses .1
+R1(config)#ip dhcp pool abc
+R1(dhcp-config)#network 10.0.0.0
+R1(dhcp-config)#default-router 10.0.0.1
+R1(dhcp-config)#lease 5
+(* 5 day lease *)
+R1(dhcp-config)#exit
+Vpcs# dhcp -r
+
+
+RIP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+🔧 GNS3 Topology Setup
+css
+Copy
+Edit
+[ VM1 (FTP Server) ] --- [ GNS3 Network ] --- [ VM2 (FTP Client) ]
+Both VMs should be:
+
+Connected to the same network segment (NAT or internal LAN in GNS3).
+
+Assigned static IPs or use DHCP from router (optional).
+
+🖥️ Step 1: Set up IP addresses (for simplicity)
+Let’s say:
+
+VM1 (FTP Server): 192.168.56.101
+
+VM2 (FTP Client): 192.168.56.102
+
+Ensure they can ping each other:
+
+bash
+Copy
+Edit
+ping 192.168.56.102  # From VM1 to VM2
+ping 192.168.56.101  # From VM2 to VM1
+📦 Step 2: Install ProFTPD on VM1 (FTP Server)
+On VM1 (the one where file will be shared from):
+
+bash
+Copy
+Edit
+sudo apt update
+sudo apt install proftpd -y
+When prompted during install, select "standalone" mode.
+
+📁 Step 3: Add File to FTP Directory
+The default FTP directory is usually /srv/ftp. Place the file you want to share:
+
+bash
+Copy
+Edit
+sudo cp /path/to/your/file.txt /srv/ftp/
+sudo chmod 644 /srv/ftp/file.txt
+Or create a test file:
+
+bash
+Copy
+Edit
+echo "Hello from VM1" | sudo tee /srv/ftp/hello.txt
+Make sure directory permissions are correct:
+
+bash
+Copy
+Edit
+sudo chmod -R 755 /srv/ftp
+🔥 Step 4: Start ProFTPD Service
+bash
+Copy
+Edit
+sudo systemctl start proftpd
+sudo systemctl enable proftpd
+Check status:
+
+bash
+Copy
+Edit
+sudo systemctl status proftpd
+📥 Step 5: Access the FTP Server from VM2 (Client)
+On VM2:
+
+Install FTP client:
+
+bash
+Copy
+Edit
+sudo apt install ftp -y
+Connect to the server:
+
+bash
+Copy
+Edit
+ftp 192.168.56.101
+Log in using:
+
+Username: anonymous
+
+Password: (press Enter)
+
+Download the file:
+
+bash
+Copy
+Edit
+ls           # to list files
+get hello.txt
+bye          # to exit
+Check the downloaded file:
+
+bash
+Copy
+Edit
+cat hello.txt
+✅ That’s It!
+You have now:
+
+Set up a working FTP server using ProFTPD.
+
+Transferred a file from VM1 → VM2.
+
+
+route rip
+network {name}
